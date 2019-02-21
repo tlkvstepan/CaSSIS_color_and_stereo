@@ -21,7 +21,7 @@ Args:
                  MY34_004204_186 no MY34_004204_186_1.
 
 Example:
-    process_folder.py \
+    tgocassis_process.py \
         "/level1c"
         "/processed"
         --no_ba
@@ -121,7 +121,6 @@ def main(input_folder, output_folder, no_ba, no_dtm, debug, observation):
             bands[sequence_type] = []
 
             for band in sequence_bands:
-                print(band)
                 (height, width, band_name) = (int(band['height']),
                                               int(band['width']), band['band'])
                 if height * width > MINIMUM_FRAMELET_AREA:
@@ -146,8 +145,6 @@ def main(input_folder, output_folder, no_ba, no_dtm, debug, observation):
             execution_string = 'tgocassis_mapproj_mosaic.py -from {} -from1 {} -to {} -ba {}'.format(
                 " ".join(framelet_lists['first_stereo']), " ".join(
                     framelet_lists['second_stereo']), observation_folder, ba)
-
-            print(execution_string)
             os.system(execution_string)
             if not no_dtm:
                 first_mosaic_framelets_folder = os.path.join(
@@ -165,18 +162,18 @@ def main(input_folder, output_folder, no_ba, no_dtm, debug, observation):
                 disparity_filename = os.path.join(
                     observation_folder,
                     '{}_disparity.tif'.format(observation_name))
-                dtm_filename = os.path.join(observation_folder, '{}_dtm.cub')
+                dtm_filename = os.path.join(
+                    observation_folder, '{}_dtm.cub'.format(observation_name))
                 execution_string = 'tgocassis_clcDisp.py {} {} {}'.format(
                     first_mosaic_filename, second_mosaic_filename,
                     disparity_filename)
                 os.system(execution_string)
-                execution_string = 'tgocassis_triangulate ASP_DISP={} MOSAIC0={} MOSAIC1={} '
-                'MAPPROJ_FRAMELETS0_DIR={} MAPPROJ_FRAMELETS1_DIR={} TO={}'.format(
+                execution_string = 'tgocassis_triangulate ASP_DISP={} MOSAIC0={} MOSAIC1={} MAPPROJ_FRAMELETS0_DIR={} MAPPROJ_FRAMELETS1_DIR={} TO={}'.format(
                     disparity_filename, first_mosaic_filename,
                     second_mosaic_filename, first_mosaic_framelets_folder,
                     second_mosaic_framelets_folder, dtm_filename)
                 os.system(execution_string)
-        if debug:
+        if not debug:
             _remove_temporary_files_and_folders(output_folder)
 
 
