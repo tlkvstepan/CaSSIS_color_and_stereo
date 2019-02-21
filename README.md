@@ -10,8 +10,14 @@ Collection of Python-ISIS-ASP for processing CaSSIS data.
 Custom ISIS applications. Should be compiled with USGS ISIS. 
 
 # Standalone package
-Stand alone package is avalable for GoogleDrive. It is build for research purposes using 
-[CDE](http://www.pgbovine.net/cde.html) virtualization tool and contains all python, ISIS, ASP dependencies so it should run standalone on any Linux machine (tested on Ubuntu14.04).
+Stand alone package is (avaliable) for Linux (tested on Ubuntu14.04). It was build for research purposes using 
+[CDE](http://www.pgbovine.net/cde.html) virtualization tool and contains all python, ISIS, ASP dependencies so it should run standalone.
+
+After downoading the package please add 
+```
+ignore_prefix=<folder_with_cassis_data>
+```
+to `cde.options` file. Where `<folder_with_cassis_data>` is a folder were level1 cassis data is stored and where you are planning to save output of the script.  
 
 Having CaSSIS level1(a,b,c..) data in folder `level1c/` run
 
