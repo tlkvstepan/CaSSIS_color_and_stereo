@@ -42,16 +42,18 @@ MINIMUM_FRAMELET_AREA = 10000
 
 def _remove_temporary_files_and_folders(folder):
     files_and_folders = os.listdir(folder)
+    print(files_and_folders)
     for file_or_folder in files_and_folders:
-        if os.path.isdir(file_or_folder):
-            _remove_recursively(file_or_folder)
+        path_to_file_or_folder = os.path.join(folder, file_or_folder)
+        if os.path.isdir(path_to_file_or_folder):
+            shutil.rmtree(path_to_file_or_folder)
         else:
             if not ('disparity' in file_or_folder or 'dtm' in file_or_folder
                     or 'colormosaic' in file_or_folder):
-                os.remove(file_or_folder)
+                os.remove(path_to_file_or_folder)
 
 
-def _remove_recursively(folder_to_remove):
+def _clean_up_folder(folder_to_remove):
     for root, folders, files in os.walk(folder_to_remove):
         for file in files:
             os.unlink(os.path.join(root, file))
@@ -91,7 +93,7 @@ def main(input_folder, output_folder, no_ba, no_dtm, debug, observation):
         'stereo') is not None, 'ASP is not installed properly.'
 
     # Clear output path.
-    _remove_recursively(to_folder)
+    _clean_up_folder(output_folder)
 
     # Browse input folder.
     execution_string = 'tgocassis_findSeq.py -from {}'.format(from_folder)
@@ -174,7 +176,7 @@ def main(input_folder, output_folder, no_ba, no_dtm, debug, observation):
                     second_mosaic_framelets_folder, dtm_filename)
                 os.system(execution_string)
         if not debug:
-            _remove_temporary_files_and_folders(output_folder)
+            _remove_temporary_files_and_folders(observation_folder)
 
 
 if __name__ == '__main__':
