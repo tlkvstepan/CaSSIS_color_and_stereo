@@ -14,11 +14,13 @@ Standalone package is avaliable for Linux (tested on Ubuntu 14.04). It was build
 [CDE](http://www.pgbovine.net/cde.html) virtualization tool and contains all python, USGS ISIS, NASA ASP dependencies.
 
 ## Set up the package
+
 Please download the package from [here](https://drive.google.com/drive/folders/1uMEPxc36iQqh5z38x0iiWrUFj2jYIJfa?usp=sharing). After downoading and extracting the package please add following line to `cde.options` file in root folder of the package
 ```
 ignore_prefix=/CaSSIS
 ```   
 where `/CaSSIS` is a folder on a local PC were cassis data is stored.
+Finally, download kernels (including ck kernel) to `cde-root/HDD1/Programs/isis_beta/data`. 
 
 ## Explore observations
 To explore observations avaliable in the input `level1c/` folder please run
