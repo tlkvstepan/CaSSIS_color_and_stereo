@@ -74,12 +74,14 @@ int getCubeFilename(int sample, int line, Cube *pCub, QString &fileName)
   Brick pixel(1, 1, 1, Isis::Real);
   pixel.SetBasePosition(sample, line, 2); // sample, line and band are '1'-based 
   pCub->read(pixel);
+  
+  if (pixel[0] == -8388613) return 1;
   int tab_idx = pixel[0] - FLOAT_MIN;
 
   // get cube name
   fileName = QString( tab[tab_idx][0] );
 
-  return tab_idx;
+  return 0;
 }
 
 
@@ -208,7 +210,7 @@ void IsisMain() {
     pProj0->SetWorld( sample0_isis, line0_isis );
     if ( !pProj0->IsGood() ) continue; // error!
     // note that here sample and line positions are 1-based
-    getCubeFilename( (int)ceil(sample0_isis), (int)ceil(line0_isis), pMosaic0, framelet0_fn);
+    if (getCubeFilename( (int)ceil(sample0_isis), (int)ceil(line0_isis), pMosaic0, framelet0_fn)) continue; // error!
     Cube *pCub0 = mapproj_framelets0[framelet0_fn.toStdString()];
     float lat0 = pProj0->UniversalLatitude();
     float lon0 = pProj0->UniversalLongitude();
@@ -238,7 +240,7 @@ void IsisMain() {
     QString framelet1_fn;
     pProj1->SetWorld( sample1_isis, line1_isis );
     if ( !pProj1->IsGood() ) continue; // error!
-    getCubeFilename( (int)ceil(sample1_isis), (int)ceil(line1_isis), pMosaic1, framelet1_fn);
+    if (getCubeFilename( (int)ceil(sample1_isis), (int)ceil(line1_isis), pMosaic1, framelet1_fn)) continue; // error!
     Cube *pCub1 = mapproj_framelets1[framelet1_fn.toStdString()];
     float lat1 = pProj1->UniversalLatitude();
     float lon1 =  pProj1->UniversalLongitude();
