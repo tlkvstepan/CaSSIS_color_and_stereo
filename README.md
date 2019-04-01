@@ -1,5 +1,5 @@
-# Stereo processing for TGO CASSIS camera. 
-Repository to store code for stereo processing of TGO CASSIS image.
+# Running NASA Ames Stereo Pipeline with TGO CASSIS. 
+Repository to store code for stereo processing of TGO CASSIS..
   
 **/isis_scripts** 
 
