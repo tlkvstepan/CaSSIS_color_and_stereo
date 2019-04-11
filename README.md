@@ -20,7 +20,12 @@ Please download the package from [here](https://drive.google.com/drive/folders/1
 ignore_prefix=/CaSSIS
 ```   
 where `/CaSSIS` is a folder on a local PC were cassis data is stored.
-Finally, download kernels (including ck kernel) to `cde-root/HDD1/Programs/isis_beta/data`. 
+Finally, update SPICE kernels in `cde-root/HDD1/Programs/isis_beta/data`. To update all but ck kernels, use USGS ISIS
+server. Simply move to `cde-root/HDD1/Programs/isis_beta/data` and run the following command
+```
+rsync -azv --delete --partial isisdist.astrogeology.usgs.gov::isis3data/data/tgo ./
+```
+The ck kernel you can download from `halimede` server.
 
 ## Explore observations
 To explore observations avaliable in the input `level1c/` folder please run
