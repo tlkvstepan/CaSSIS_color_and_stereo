@@ -2,7 +2,7 @@
 
 <application name="tgocassisrdrgen" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
   <brief>
-    Converts CaSSIS cubes into PDS 4 standard format
+    Performs stereo triangulation.
   </brief>
 
   <description>
@@ -17,77 +17,80 @@
   </category>
 
   <groups>
-    <group name="Files">
-      <parameter name="ASP_DISP">
+    <group name="Input files">
+      <parameter name="DISPARITY">
         <type>cube</type>
         <fileMode>input</fileMode>
         <brief>
-          This is disparity produced by ASP and saved as geotiff (default).
+          Horizontal and vertical disarities produced saved as geotiff.
+        </brief>
+        <description>
+        </description>
+        <filter>*.tif</filter>
+      </parameter>
+      <parameter name="MOSAIC_0">
+        <type>cube</type>
+        <fileMode>input</fileMode>
+        <brief>
+          Map-projected mosaic of the first sequence of stereo observation.
+        </brief>
+        <description>
+        </description>
+        <filter>*.cub</filter>
+      </parameter>
+      <parameter name="MOSAIC_1">
+        <type>cube</type>
+        <fileMode>input</fileMode>
+        <brief>
+          Map-projected mosaic of the second sequence of stereo observation.
         </brief>
         <description>
         </description>
         <filter>*.cub</filter>
       </parameter>
     </group>
-    <group name="Files">
-      <parameter name="MOSAIC0">
+    <group name="Input folders">
+      <parameter name="FRAMELETS_0">
         <type>cube</type>
         <fileMode>input</fileMode>
         <brief>
-          This is mosaic0 cube.
+          Folder with map-projected framelets of the first sequence.
         </brief>
         <description>
         </description>
-        <filter>*.cub</filter>
       </parameter>
-    </group>
-    <group name="Files">
-      <parameter name="MOSAIC1">
+      <parameter name="FRAMELETS_1">
         <type>cube</type>
         <fileMode>input</fileMode>
         <brief>
-          This is mosaic1 cube.
+          Folder with map-projected framelets of the second sequence.
         </brief>
         <description>
         </description>
-        <filter>*.cub</filter>
       </parameter>
     </group>
-    <group name="Folder">
-      <parameter name="MAPPROJ_FRAMELETS0_DIR">
-        <type>cube</type>
-        <fileMode>input</fileMode>
-        <brief>
-          This is folder with mapprojected framelets.
-        </brief>
-        <description>
-        </description>
-        <filter>*.cub</filter>
-      </parameter>
-    </group>
-    <group name="Folder">
-      <parameter name="MAPPROJ_FRAMELETS1_DIR">
-        <type>cube</type>
-        <fileMode>input</fileMode>
-        <brief>
-          This is folder with mapprojected framelets.
-        </brief>
-        <description>
-        </description>
-        <filter>*.cub</filter>
-      </parameter>
-    </group>
-    <group name="Files">
-      <parameter name="TO">
+    <group name="Output files">
+      <parameter name="DTM">
         <type>cube</type>
         <fileMode>output</fileMode>
         <brief>
-          This is binary matches.
+          Map-projected digital elevation model computed with respect to Mars ellispoid.
+        </brief>
+        <description>
+        </description>
+        <filter>*.cub</filter>
+      </parameter>
+      <parameter name="ERROR">
+        <type>cube</type>
+        <fileMode>output</fileMode>
+        <brief>
+          Triangulation error.
         </brief>
         <description>
         </description>
         <filter>*.cub</filter>
       </parameter>
     </group>
+
   </groups>
 </application>
