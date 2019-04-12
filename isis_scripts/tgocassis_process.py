@@ -166,14 +166,19 @@ def main(input_folder, output_folder, no_ba, no_dtm, debug, observation):
                     '{}_disparity.tif'.format(observation_name))
                 dtm_filename = os.path.join(
                     observation_folder, '{}_dtm.cub'.format(observation_name))
+                error_filename = os.path.join(
+                    observation_folder,
+                    '{}_error.cub'.format(observation_name))
                 execution_string = 'tgocassis_clcDisp.py {} {} {}'.format(
                     first_mosaic_filename, second_mosaic_filename,
                     disparity_filename)
                 os.system(execution_string)
-                execution_string = 'tgocassis_triangulate ASP_DISP={} MOSAIC0={} MOSAIC1={} MAPPROJ_FRAMELETS0_DIR={} MAPPROJ_FRAMELETS1_DIR={} TO={}'.format(
+                execution_string = 'tgocassis_triangulate DISPARITY={} MOSAIC_0={}'
+                ' MOSAIC_1={} FRAMELETS_0={} FRAMELETS_1={} DTM={} ERROR={}'.format(
                     disparity_filename, first_mosaic_filename,
                     second_mosaic_filename, first_mosaic_framelets_folder,
-                    second_mosaic_framelets_folder, dtm_filename)
+                    second_mosaic_framelets_folder, dtm_filename,
+                    error_filename)
                 os.system(execution_string)
         if not debug:
             _remove_temporary_files_and_folders(observation_folder)
