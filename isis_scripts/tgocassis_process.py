@@ -173,8 +173,7 @@ def main(input_folder, output_folder, no_ba, no_dtm, debug, observation):
                     first_mosaic_filename, second_mosaic_filename,
                     disparity_filename)
                 os.system(execution_string)
-                execution_string = 'tgocassis_triangulate DISPARITY={} MOSAIC_0={}'
-                ' MOSAIC_1={} FRAMELETS_0={} FRAMELETS_1={} DTM={} ERROR={}'.format(
+                execution_string = 'tgocassis_triangulate DISPARITY={} MOSAIC_0={} MOSAIC_1={} FRAMELETS_0={} FRAMELETS_1={} DTM={} ERROR={}'.format(
                     disparity_filename, first_mosaic_filename,
                     second_mosaic_filename, first_mosaic_framelets_folder,
                     second_mosaic_framelets_folder, dtm_filename,

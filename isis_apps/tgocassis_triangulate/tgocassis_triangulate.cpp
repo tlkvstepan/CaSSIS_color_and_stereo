@@ -131,19 +131,19 @@ void IsisMain() {
   vector<float> dispy;
   vector<float> mask;
   int width, height;
-  readGeotiff( ui.GetFileName("ASP_DISP").toStdString(), width, height, dispx, dispy, mask );
+  readGeotiff( ui.GetFileName("DISPARITY").toStdString(), width, height, dispx, dispy, mask );
 
   // Read mosaic cubes
-  Cube* pMosaic0 = p.SetInputCube("MOSAIC0");
-  Cube* pMosaic1 = p.SetInputCube("MOSAIC1");
+  Cube* pMosaic0 = p.SetInputCube("MOSAIC_0");
+  Cube* pMosaic1 = p.SetInputCube("MOSAIC_1");
     
   // Read corresponding projections
   TProjection *pProj0 = (TProjection *) pMosaic0->projection();
   TProjection *pProj1 = (TProjection *) pMosaic1->projection();
 
   // Read map-projected framelets folder
-  string mapproj_framelet0_dn = ui.GetFileName("MAPPROJ_FRAMELETS0_DIR").toStdString();
-  string mapproj_framelet1_dn = ui.GetFileName("MAPPROJ_FRAMELETS1_DIR").toStdString();
+  string mapproj_framelet0_dn = ui.GetFileName("FRAMELETS_0").toStdString();
+  string mapproj_framelet1_dn = ui.GetFileName("FRAMELETS_1").toStdString();
  
   // Load all cubes from specified folders to hash table
   unordered_map<string, Cube*> mapproj_framelets0;
@@ -152,12 +152,17 @@ void IsisMain() {
   unordered_map<string, Cube*> mapproj_framelets1;
   preloadCubes(mapproj_framelet1_dn.c_str(), mapproj_framelets1);
 
-  // Make output cube with elevation
+  // Make output cube with digital elevation model.
   int samps = pMosaic0->sampleCount();
   int lines = pMosaic0->lineCount();
-  CubeAttributeOutput &outatt = ui.GetOutputAttribute("TO");
-  QString outfile = ui.GetFileName("TO");
-  Cube* pElev = p.SetOutputCube(outfile, outatt, samps, lines, 1);
+  CubeAttributeOutput &dtm_attribute = ui.GetOutputAttribute("DTM");
+  QString dtm_file = ui.GetFileName("DTM");
+  Cube* pElev = p.SetOutputCube(dtm_file, dtm_attribute, samps, lines, 1);
+  
+  // Make output cube with triangulation error.
+  CubeAttributeOutput &error_attribute = ui.GetOutputAttribute("ERROR");
+  QString error_file = ui.GetFileName("ERROR");
+  Cube* pTriangulationError = p.SetOutputCube(error_file, error_attribute, samps, lines, 1);
   
   // Allocate space for distances
   // we use it to perform nn-interpolation
@@ -295,12 +300,18 @@ void IsisMain() {
     cout << "  closest surfcae point: " << surfPoint[0] << " " << surfPoint[1] << " " << surfPoint[2] << " " << endl;
     #endif
 
-    // compute sample / line position in map-projected
+    // Compute sample / line position in map-projected
     pProj0->SetUniversalGround(xLat, xLon);
     if( pProj0->IsGood() ){
 
       float xLine   = pProj0->WorldY() + 0.5;  // 1-based
       float xSample = pProj0->WorldX() + 0.5;
+
+      // Record triangulation error.
+      Brick pixel(1, 1, 1, Isis::Real);
+      pixel.SetBasePosition(xSample, xLine, 1); // 1-based 
+      pixel[0] = error;
+      pTriangulationError->write(pixel);
 
       for( int dline = 0; dline <= 1; dline++ )
       for( int dsample = 0; dsample <= 1; dsample++ )
