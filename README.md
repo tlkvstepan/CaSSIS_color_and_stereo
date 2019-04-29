@@ -53,14 +53,12 @@ For each observation in `level1c/` the script creates individual folder in `proc
 ## Run triangulation
 To run only triangulation please execute 
 ```
-	tgocassis_triangulate.py.cde \
-		DISPARITY="/CaSSIS/181027_stp028_boot6/processed/M07/MY34_004204_186_stereo/MY34_004204_186_disparity.tif"
-		MOSAIC_0="/CaSSIS/181027_stp028_boot6/processed/M07/MY34_004204_186_stereo/MY34_004204_186_first_stereo_PAN_MOS.cub"
-		MOSAIC_1="/CaSSIS/181027_stp028_boot6/processed/M07/MY34_004204_186_stereo/MY34_004204_186_second_stereo_PAN_MOS.cub"
-		FRAMELETS_0="/CaSSIS/M07/181027_stp028_boot6/processed/MY34_004204_186_stereo/MY34_004204_186_first_stereo_PAN_MAP"
-		FRAMELETS_1="/CaSSIS/M07/181027_stp028_boot6/processed/MY34_004204_186_stereo/MY34_004204_186_second_stereo_PAN_MAP"
-DTM="/CaSSIS/M07/181027_stp028_boot6/processed/MY34_004204_186_stereo/MY34_004204_186_dtm.cub"
-ERROR="/CaSSIS/M07/181027_stp028_boot6/processed/MY34_004204_186_stereo/MY34_004204_186_error.cub"
+tgocassis_triangulate.py.cde \
+	DISPARITY="/CaSSIS/181027_stp028_boot6/processed/M07/MY34_004204_186_stereo/MY34_004204_186_disparity.tif"		MOSAIC_0="/CaSSIS/181027_stp028_boot6/processed/M07/MY34_004204_186_stereo/MY34_004204_186_first_stereo_PAN_MOS.cub"
+	MOSAIC_1="/CaSSIS/181027_stp028_boot6/processed/M07/MY34_004204_186_stereo/MY34_004204_186_second_stereo_PAN_MOS.cub"
+	FRAMELETS_0="/CaSSIS/M07/181027_stp028_boot6/processed/MY34_004204_186_stereo/MY34_004204_186_first_stereo_PAN_MAP"	   FRAMELETS_1="/CaSSIS/M07/181027_stp028_boot6/processed/MY34_004204_186_stereo/MY34_004204_186_second_stereo_PAN_MAP"
+        DTM="/CaSSIS/M07/181027_stp028_boot6/processed/MY34_004204_186_stereo/MY34_004204_186_dtm.cub"
+        ERROR="/CaSSIS/M07/181027_stp028_boot6/processed/MY34_004204_186_stereo/MY34_004204_186_error.cub"
 ```
 
 
