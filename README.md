@@ -17,7 +17,7 @@ Standalone package is avaliable for Linux (tested on Ubuntu 14.04). It was build
 
 Please download the package from [here](https://drive.google.com/drive/folders/1uMEPxc36iQqh5z38x0iiWrUFj2jYIJfa?usp=sharing). After downoading and extracting the package please add following line to `cde.options` file in root folder of the package
 ```
-ignore_prefix=/CaSSIS
+ignore_prefix=/CaSSIS/
 ```   
 where `/CaSSIS` is a folder on a local PC were cassis data is stored.
 Finally, update SPICE kernels in `cde-root/HDD1/Programs/isis_beta/data`. To update all but ck kernels, use USGS ISIS
