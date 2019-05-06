@@ -30,8 +30,9 @@ The ck kernel you can download from `halimede` server.
 ## Explore observations
 To explore observations avaliable in the input `level1c/` folder please run
 ```
-tgocassis_findSeq.py.cde "/CaSSIS/M07/181027_stp028_boot6/level1c"
+tgocassis_findSeq.py.cde -from "/CaSSIS/M07/181027_stp028_boot6/level1c"
 ```
+Note, that level1c files should have special naming, such as `CAS-M07-2018-11-02T23.40.28.577-NIR-01019-C1.dat`.
 The script creates `summary.csv` file in `level1c/` folder with summary of all observation in the folder.
 
 ## Process observations
