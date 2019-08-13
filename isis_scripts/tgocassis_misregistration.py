@@ -3,7 +3,6 @@
 
 Args:
     path_to_input_folder: Folder (possibly with subfolders) that contains mosaics.
-    path_to_output_file: csv with band misregistration in every mosaic. The first
                  column contains name of the mosaic, the second x-shift and
                  the third y-shift.
     source_band: band that will be translated.
@@ -17,10 +16,10 @@ Example:
         "misregistration.csv"
         --source_band RED
         --target_band NIR
+        --visualize 
 """
 import click
 import commands
-import csv
 import os
 import tempfile
 
@@ -63,11 +62,11 @@ def save_matrix(filename,
         colormap: map that determines color coding of matrix values.
     """
     figure = plt.figure()
-    noninf_mask = matrix != float('inf')
+    noninf_mask = ~np.isnan(matrix)
     if minimum_value is None:
-        minimum_value = np.percentile(matrix[noninf_mask], 0.1)
+        minimum_value = np.percentile(matrix[noninf_mask], 1)
     if maximum_value is None:
-        maximum_value = np.percentile(matrix[noninf_mask], 99.9)
+        maximum_value = np.percentile(matrix[noninf_mask], 99)
     plot = plt.imshow(matrix, colormap, vmin=minimum_value, vmax=maximum_value)
     if is_colorbar:
         _add_scaled_colorbar(plot)
@@ -77,7 +76,45 @@ def save_matrix(filename,
     plt.close()
 
 
-def _make_deffile():
+def _bands(mosaic_filename):
+    """Returns list of bands in a mosaics (ISIS CUB).
+
+    Args: 
+        mosaic_filename: filename of ISIS CUB mosaic.
+    """
+    exec_string = 'catlab from={}'.format(mosaic_filename)
+    _, output_string = commands.getstatusoutput(exec_string)
+    start_of_filters_list = output_string.find('FilterName = (') + 14
+    end_of_filters_list = output_string.find(')\n', start_of_filters_list)
+    filters_string = output_string[start_of_filters_list:end_of_filters_list]
+    return filters_string.split(', ')
+
+
+def _basename_wo_extension(path_to_file):
+    return os.path.basename(path_to_file).split('.')[0]
+
+
+def _explode(mosaic_filename):
+    """Returns band of a mosaic (ISIS CUB).
+
+    Args: 
+        mosaic_filename: filename of ISIS CUB mosaic.
+    """
+    basename = _basename_wo_extension(mosaic_filename)
+    explode_prefix = os.path.join(tempfile.mkdtemp(), basename)
+    exec_string = 'explode from={} to={}'.format(mosaic_filename,
+                                                 explode_prefix)
+    os.system(exec_string)
+    bands_list = _bands(mosaic_filename)
+    path_to_band_files = {}
+    for band_index, band_name in enumerate(bands_list):
+        path_to_band_files[
+            band_name] = explode_prefix + '.band{:04d}.cub'.format(band_index +
+                                                                   1)
+    return path_to_band_files
+
+
+def _search_deffile():
     search_deffile = tempfile.mkstemp(suffix='.def')[1]
     with open(search_deffile, 'w') as f:
         content_str = """ 
@@ -101,51 +138,9 @@ def _make_deffile():
     return search_deffile
 
 
-def _size(mosaic_filename):
-    exec_string = 'catlab from={}'.format(mosaic_filename)
-    _, output_string = commands.getstatusoutput(exec_string)
-    start_of_filters_list = output_string.find(' Samples = ') + 10
-    end_of_filters_list = output_string.find('\n', start_of_filters_list)
-    samples = int(output_string[start_of_filters_list:end_of_filters_list])
-    start_of_filters_list = output_string.find(' Lines   = ') + 10
-    end_of_filters_list = output_string.find('\n', start_of_filters_list)
-    lines = int(output_string[start_of_filters_list:end_of_filters_list])
-    return samples, lines
-
-
-def _explode(mosaic_filename):
-    """Returns filenames of the exploded mosaic (ISIS CUB)."""
-    basename = _basename_wo_extension(mosaic_filename)
-    explode_prefix = os.path.join(tempfile.mkdtemp(), basename)
-    exec_string = 'explode from={} to={}'.format(mosaic_filename,
-                                                 explode_prefix)
-    os.system(exec_string)
-    bands_list = _bands(mosaic_filename)
-    path_to_band_files = {}
-    for band_index, band_name in enumerate(bands_list):
-        path_to_band_files[
-            band_name] = explode_prefix + '.band{:04d}.cub'.format(band_index +
-                                                                   1)
-    return path_to_band_files
-
-
-def _basename_wo_extension(path_to_file):
-    return os.path.basename(path_to_file).split('.')[0]
-
-
-def _bands(mosaic_filename):
-    """Returns list of bands in a mosaics (ISIS CUB)."""
-    exec_string = 'catlab from={}'.format(mosaic_filename)
-    _, output_string = commands.getstatusoutput(exec_string)
-    start_of_filters_list = output_string.find('FilterName = (') + 14
-    end_of_filters_list = output_string.find(')\n', start_of_filters_list)
-    filters_string = output_string[start_of_filters_list:end_of_filters_list]
-    return filters_string.split(', ')
-
-
 def _register(source_filename, target_filename):
     results_filename = tempfile.mkstemp(suffix='.txt')[1]
-    search_deffile = _make_deffile()
+    search_deffile = _search_deffile()
     exec_string = 'coreg from={} match={} deffile={} flatfile={}'.format(
         source_filename, target_filename, search_deffile, results_filename)
     commands.getstatusoutput(exec_string)
@@ -165,40 +160,32 @@ def _compute_bands_mismatch(mosaic_filename, source_band, target_band):
 
 @click.command()
 @click.argument('path_to_input_folder', type=click.Path(exists=True))
-@click.argument('path_to_output_file', type=click.Path(exists=False))
-@click.option('--source_band', default='RED')
+@click.option('--source_band', default='PAN')
 @click.option('--target_band', is_flag='NIR')
-@click.option('--visualize', is_flag=False)
-def main(path_to_input_folder, path_to_output_file, source_band, target_band,
-         visualize):
-    path_to_output_file = os.path.abspath(path_to_output_file)
-    output_file = open(path_to_output_file, 'wb')
-    field_names = ['filename', 'x_shift', 'y_shift']
-    output_writer = csv.DictWriter(
-        output_file, delimiter=',', fieldnames=field_names)
-    output_writer.writeheader()
+@click.option('--visualize', is_flag=True)
+def main(path_to_input_folder, source_band, target_band, visualize):
     path_to_input_folder = os.path.abspath(path_to_input_folder)
     x_shifts = []
     y_shifts = []
+    shifts = []
+    filenames = []
     for directory, _, files_list in os.walk(path_to_input_folder):
         for filename in files_list:
             if '.cub' in filename:
                 path_to_input_file = os.path.join(directory, filename)
-                path_to_x_shift_visualization_file = os.path.join(
-                    directory, filename[:-4] + '_x_shift.png')
-                path_to_y_shift_visualization_file = os.path.join(
-                    directory, filename[:-4] + '_y_shift.png')
                 result = _compute_bands_mismatch(path_to_input_file,
                                                  source_band, target_band)
                 if result is not None:
                     (x_source, y_source, x_shift, y_shift) = result
                     if visualize:
-                        number_of_samples, number_of_lines = _size(
-                            path_to_input_file)
+                        path_to_x_shift_visualization_file = os.path.join(
+                            directory, filename[:-4] + '_x_shift.pdf')
+                        path_to_y_shift_visualization_file = os.path.join(
+                            directory, filename[:-4] + '_y_shift.pdf')
                         points = (x_source, y_source)
                         x_grid, y_grid = np.meshgrid(
-                            np.arange(1, number_of_samples),
-                            np.arange(1, number_of_lines))
+                            np.arange(x_source.min(), x_source.max(), 5),
+                            np.arange(y_source.min(), y_source.max(), 5))
                         x_shift_visualization = interpolate.griddata(
                             points, x_shift, (x_grid, y_grid), method='linear')
                         y_shift_visualization = interpolate.griddata(
@@ -206,27 +193,21 @@ def main(path_to_input_folder, path_to_output_file, source_band, target_band,
                         save_matrix(
                             path_to_x_shift_visualization_file,
                             x_shift_visualization,
-                            minimum_value=-10,
-                            maximum_value=10,
                             colormap='magma',
                             is_colorbar=True)
                         save_matrix(
                             path_to_y_shift_visualization_file,
                             y_shift_visualization,
-                            minimum_value=-10,
-                            maximum_value=10,
                             colormap='magma',
                             is_colorbar=True)
                     x_shifts.append(np.median(x_shift))
                     y_shifts.append(np.median(y_shift))
-                    output_writer.writerow({
-                        'filename': filename,
-                        'x_shift': x_shift,
-                        'y_shift': y_shift
-                    })
-    output_writer.writerow({
-        'filename': 'average',
-        'x_shift': np.mean(x_shifts),
-        'y_shift': np.mean(y_shifts)
-    })
-    output_file.close()
+                    shifts.append(np.median(np.sqrt(x_shift**2 + y_shift**2)))
+                    filenames.append(filename)
+    print('In total {} files processed'.format(len(filenames)))
+    print('x-misalignment: {}+/-{}'.format(
+        np.mean(x_shifts), np.std(x_shifts)))
+    print('y-misalignment: {}+/-{}'.format(
+        np.mean(y_shifts), np.std(y_shifts)))
+    print('Euclidian misalignment: {}+/-{}'.format(
+        np.mean(shifts), np.std(shifts)))
