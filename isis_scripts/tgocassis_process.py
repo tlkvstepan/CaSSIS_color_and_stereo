@@ -13,6 +13,8 @@ Args:
     no_ba: if flag is True, the script will not perform bundle adjustment.
     no_dtm: if flag is True, the scipts will not compute disparity image
             and DTMs for every observation.
+    match_tone: if flag is True, the script will apply gain and bias to
+                framelets to match tone of framelets overlaps.
     debug: if flag is True, the script keeps all intermediated results,
            otherwise they are deleted.
     observation: process only specified observation. Multiple observations ca
@@ -24,6 +26,7 @@ Example:
     tgocassis_process.py \
         "/level1c"
         "/processed"
+        --match_tone
         --no_ba
         --no_dtm
         --debug
@@ -74,16 +77,21 @@ def _filter_by_sequence_type(sequences, sequences_type):
 @click.command()
 @click.argument('input_folder', type=click.Path(exists=True))
 @click.argument('output_folder', type=click.Path(exists=False))
+@click.option('--match_tone', is_flag=True)
 @click.option('--no_ba', is_flag=True)
 @click.option('--no_dtm', is_flag=True)
 @click.option('--debug', is_flag=True)
 @click.option('--observation', multiple=True)
-def main(input_folder, output_folder, no_ba, no_dtm, debug, observation):
+def main(input_folder, output_folder, match_tone, no_ba, no_dtm, debug,
+         observation):
     from_folder = os.path.abspath(input_folder)
     to_folder = os.path.abspath(output_folder)
     ba = 'yes'
+    match_tone = 'no'
     if no_ba:
         ba = 'no'
+    if match_tone:
+        match_tone = 'yes'
     assert os.environ.get(
         'ISISROOT') is not None, 'ISIS is not installed properly.'
     assert spawn.find_executable(
@@ -136,17 +144,19 @@ def main(input_folder, output_folder, no_ba, no_dtm, debug, observation):
             observation_folder = os.path.join(
                 to_folder, '{}_mono'.format(observation_name))
             os.makedirs(observation_folder)
-            execution_string = 'tgocassis_mapproj_mosaic.py -from {} -to {} -ba {}'.format(
-                " ".join(framelet_lists['mono']), observation_folder, ba)
+            execution_string = 'tgocassis_mapproj_mosaic.py -from {} -to {} -ba {} -match_tone {}'.format(
+                " ".join(framelet_lists['mono']), observation_folder, ba,
+                match_tone)
             os.system(execution_string)
         else:
             # Stereo mode.
             observation_folder = os.path.join(
                 to_folder, '{}_stereo'.format(observation_name))
             os.makedirs(observation_folder)
-            execution_string = 'tgocassis_mapproj_mosaic.py -from {} -from1 {} -to {} -ba {}'.format(
+            execution_string = 'tgocassis_mapproj_mosaic.py -from {} -from1 {} -to {} -ba {} -match_tone {}'.format(
                 " ".join(framelet_lists['first_stereo']), " ".join(
-                    framelet_lists['second_stereo']), observation_folder, ba)
+                    framelet_lists['second_stereo']), observation_folder, ba,
+                match_tone)
             os.system(execution_string)
             if not no_dtm:
                 first_mosaic_framelets_folder = os.path.join(

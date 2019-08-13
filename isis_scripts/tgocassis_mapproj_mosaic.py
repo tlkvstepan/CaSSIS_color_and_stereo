@@ -1,13 +1,8 @@
 #!/usr/bin/env python
-import sys
-import re
-import tempfile
+import argparse
 import os
 import shutil
-import tgocassis_utils as tgo
-import commands
-import glob
-import argparse
+import sys
 
 parser = argparse.ArgumentParser(
     description=
@@ -35,11 +30,20 @@ parser.add_argument(
     dest='out_dir',
     help='output directory',
     required=True)
+
 parser.add_argument(
     '-ba', dest='ba', default='no', help='perform bundle adjustment')
 
+parser.add_argument(
+    '-match_tone',
+    dest='match_tone',
+    default='no',
+    help='perform tone matching')
+
 args = parser.parse_args()
-if args.ba == 'no' or args.ba == 'No' or args.ba == 'NO' or args.ba == 'FALSE' or args.ba == 'false' or args.ba == 'False':
+
+if (args.ba == 'no' or args.ba == 'No' or args.ba == 'NO' or args.ba == 'FALSE'
+        or args.ba == 'false' or args.ba == 'False'):
     args.ba = False
 else:
     args.ba = True
@@ -89,7 +93,8 @@ for index, sequence_framelet_lists in enumerate(stereo_framelet_lists):
         sequence_framelet_lists[0])[:-8] + '_' + '_'.join(
             band_framelet_list[-7:-4]
             for band_framelet_list in sequence_framelet_lists)
-    colormosaic_file = os.path.join(args.out_dir, sequence_name + '_colormosaic.cub')
+    colormosaic_file = os.path.join(args.out_dir,
+                                    sequence_name + '_colormosaic.cub')
     # in browse file we can save only 3 channel
     sequence_name = os.path.basename(
         sequence_framelet_lists[0])[:-8] + '_' + '_'.join([
@@ -251,8 +256,9 @@ for nsequence, sequence_framelet_lists in enumerate(stereo_framelet_lists):
 
         band_mosaic_file = stereo_mosaic_files[nsequence][band_id]
 
-        exe_str = 'tgocassis_mapMos.py "%s" "%s" "%s" "%s" yes' % (
-            band_cube_dir, map_file, band_mapproj_dir, band_mosaic_file)
+        exe_str = 'tgocassis_mapMos.py "%s" "%s" "%s" "%s" "%s"' % (
+            band_cube_dir, map_file, band_mapproj_dir, band_mosaic_file,
+            match_tone)
         os.system(exe_str)
 
 for nsequence, sequence_framelet_lists in enumerate(stereo_framelet_lists):

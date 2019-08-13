@@ -1,12 +1,9 @@
 #!/usr/bin/env python
-import sys
-import re
-import tempfile
-import os
-import shutil
-import tgocassis_utils as tgo
 import commands
 import glob
+import os
+import sys
+import tempfile
 
 if len(sys.argv) < 5:
     print(
@@ -22,7 +19,7 @@ cub_dirname = os.path.abspath(sys.argv[1])
 map_filename = os.path.abspath(sys.argv[2])
 map_dirname = os.path.abspath(sys.argv[3])
 mosaic_filename = os.path.abspath(sys.argv[4])
-equ = (sys.argv[5] == 'yes') or (sys.argv[5] == 'Yes') or (
+match_tone = (sys.argv[5] == 'yes') or (sys.argv[5] == 'Yes') or (
     sys.argv[5] == 'YES') or (sys.argv[5] == 'true') or (
         sys.argv[5] == 'TRUE') or (sys.argv[5] == 'True')
 
@@ -66,7 +63,7 @@ os.system(exe_str)
 exe_str = 'ls "%s/"*".cub" > "%s"' % (map_dirname, alllis_fn)
 os.system(exe_str)
 
-if equ:
+if match_tone:
     # make held cubes list
     heldlis_fn = tempfile.mktemp()
     with open(alllis_fn, 'r') as f:
