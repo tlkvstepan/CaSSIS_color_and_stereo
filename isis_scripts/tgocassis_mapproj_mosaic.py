@@ -102,7 +102,8 @@ for index, sequence_framelet_lists in enumerate(stereo_framelet_lists):
                 i,
                 len(sequence_framelet_lists) - 1)][-7:-4] for i in range(0, 3)
         ])
-    browse_file = os.path.join(args.out_dir, sequence_name + '_colormosaic.png')
+    browse_file = os.path.join(args.out_dir,
+                               sequence_name + '_colormosaic.png')
 
     stereo_colormosaic_files.append(colormosaic_file)
     stereo_browse_files.append(browse_file)
@@ -258,7 +259,7 @@ for nsequence, sequence_framelet_lists in enumerate(stereo_framelet_lists):
 
         exe_str = 'tgocassis_mapMos.py "%s" "%s" "%s" "%s" "%s"' % (
             band_cube_dir, map_file, band_mapproj_dir, band_mosaic_file,
-            match_tone)
+            args.match_tone)
         os.system(exe_str)
 
 for nsequence, sequence_framelet_lists in enumerate(stereo_framelet_lists):
