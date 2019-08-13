@@ -1,8 +1,6 @@
 #!/usr/bin/env python
 import sys
 import os
-from shutil import copyfile
-import glob
 import tempfile
 
 if len(sys.argv) < 3:
@@ -26,6 +24,7 @@ for input_fn in input_list_fn:
     assert os.path.isfile(input_fn), 'File %s does not exist' % (input_fn)
 
 cub_lis = tempfile.mktemp()
+untrimmed_mosaic = tempfile.mktemp(suffix='.cub')
 
 # make list
 with open(cub_lis, 'w') as file:
@@ -33,8 +32,13 @@ with open(cub_lis, 'w') as file:
         file.write("%s\n" % input_fn)
 
 # join cubes
-exe_str = 'cubeit fromlist="%s" to="%s"' % (cub_lis, output_fn)
+exe_str = 'cubeit fromlist="%s" to="%s"' % (cub_lis, untrimmed_mosaic)
 print 'Calling %s' % exe_str
+os.system(exe_str)
+
+# trim areas which do not have all bands
+exe_str = 'bandtrim from="%s" to="%s"' % (
+    untrimmed_mosaic, output_fn)
 os.system(exe_str)
 
 os.remove(cub_lis)
