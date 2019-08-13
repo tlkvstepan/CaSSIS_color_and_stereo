@@ -102,7 +102,7 @@ for index, sequence_framelet_lists in enumerate(stereo_framelet_lists):
                 i,
                 len(sequence_framelet_lists) - 1)][-7:-4] for i in range(0, 3)
         ])
-    browse_file = os.path.join(args.out_dir, sequence_name + '.png')
+    browse_file = os.path.join(args.out_dir, sequence_name + '_colormosaic.png')
 
     stereo_colormosaic_files.append(colormosaic_file)
     stereo_browse_files.append(browse_file)
