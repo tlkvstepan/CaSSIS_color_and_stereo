@@ -161,7 +161,7 @@ def _compute_bands_mismatch(mosaic_filename, source_band, target_band):
 @click.command()
 @click.argument('path_to_input_folder', type=click.Path(exists=True))
 @click.option('--source_band', default='PAN')
-@click.option('--target_band', is_flag='NIR')
+@click.option('--target_band', default='NIR')
 @click.option('--visualize', is_flag=True)
 def main(path_to_input_folder, source_band, target_band, visualize):
     path_to_input_folder = os.path.abspath(path_to_input_folder)
@@ -211,3 +211,7 @@ def main(path_to_input_folder, source_band, target_band, visualize):
         np.mean(y_shifts), np.std(y_shifts)))
     print('Euclidian misalignment: {}+/-{}'.format(
         np.mean(shifts), np.std(shifts)))
+
+
+if __name__ == '__main__':
+    main()

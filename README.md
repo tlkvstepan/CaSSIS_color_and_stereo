@@ -43,13 +43,25 @@ tgocassis_process.py.cde \
         "/CaSSIS/M07/181027_stp028_boot6/processed"
         --no_ba
         --no_dtm
+        --match_tone
         --debug
         --observation MY34_004204_186
         --observation MY34_004204_235
 ```
 For each observation in `level1c/` the script creates individual folder in `processed/` folder. For "mono" observations the scripts creates map-projected bundle-adjusted color mosaic, and for "stereo" observations it creates two map-projected bundle-adjusted color mosaics, disparity image and DTM.
 
-`--no_ba` flag turns off the bundle adjustment, `--no_dtm` flag disables DTM computation, `--debug` flag forces script to preserve debug information and `--observation` option allows to specify observation for processing.  
+`--no_ba` flag turns off the bundle adjustment, `--no_dtm` flag disables DTM computation, `--match_tone` flag enables tone matching of framelets, `--debug` flag forces script to preserve debug information and `--observation` option allows to specify observation for processing.  
+
+## Evaluate color mosaic reconstruction quality
+To compute color bands misalignment in reconstructed mosaics in `processed/` folder, please run
+```
+tgocassis_misregistration.py \
+        "/CaSSIS/M07/181027_stp028_boot6/processed"
+        --source_band RED
+        --target_band NIR
+        --visualize 
+```
+The script computes average cross-track, along-track and Euclidian color bands misalignment for mosaics in the input folder, which contain requested source and target bands. When ``--visualize`` flag is set the script also saves pixel-wise visualization of the misalignment in the input folder as a pdf image.  
 
 ## Run triangulation
 To run only triangulation please execute 
