@@ -87,11 +87,12 @@ def main(input_folder, output_folder, match_tone, no_ba, no_dtm, debug,
     from_folder = os.path.abspath(input_folder)
     to_folder = os.path.abspath(output_folder)
     ba = 'yes'
-    match_tone = 'no'
     if no_ba:
         ba = 'no'
     if match_tone:
         match_tone = 'yes'
+    else:
+        match_tone = 'no'
     assert os.environ.get(
         'ISISROOT') is not None, 'ISIS is not installed properly.'
     assert spawn.find_executable(
